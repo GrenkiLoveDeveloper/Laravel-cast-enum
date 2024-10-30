@@ -8,10 +8,15 @@ use BackedEnum;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
-class NullableEnum implements CastsAttributes
+final class NullableEnum implements CastsAttributes
 {
     private string $enumClass;
 
+    /**
+     * Constructor.
+     *
+     * @param string $enumClass
+     */
     public function __construct(string $enumClass)
     {
         $this->enumClass = $enumClass;
@@ -20,7 +25,11 @@ class NullableEnum implements CastsAttributes
     /**
      * Cast the given value.
      *
+     * @param  Model  $model
+     * @param  string  $key
+     * @param  mixed  $value
      * @param  array<string, mixed>  $attributes
+     * @return mixed
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
@@ -32,10 +41,14 @@ class NullableEnum implements CastsAttributes
     }
 
     /**
-     * Prepare the given value for storage.
-     *
-     * @param  array<string, mixed>  $attributes
-     */
+    * Prepare the given value for storage.
+    *
+    * @param  Model  $model
+    * @param  string  $key
+    * @param  mixed  $value
+    * @param  array<string, mixed>  $attributes
+    * @return mixed
+    */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
         return $value;
