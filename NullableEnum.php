@@ -33,11 +33,12 @@ final class NullableEnum implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        if (in_array($value, [null, '', '0', 0], true)) {
-            return null;
-        }
-
-        return ($value instanceof BackedEnum) ? $value : $this->enumClass::tryFrom($value);
+        return match (true) {
+            $value instanceof BackedEnum => $value,
+            is_numeric($value) => $this->convertNumericToString((int) $value),
+            is_scalar($value) => $this->enumClass::tryFrom($value),
+            default => null,
+        };
     }
 
     /**
@@ -52,5 +53,27 @@ final class NullableEnum implements CastsAttributes
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
         return $value;
+    }
+
+    /**
+     * Преобразование числового значения в строковое представление enum.
+     *
+     * @param int $numericValue
+     * @return string|null
+     */
+    private function convertNumericToString(int $numericValue): ?string
+    {
+        $mapping = $this->getMapping();
+        return array_search($numericValue, $mapping, true) ?: null;
+    }
+
+    /**
+     * Получение маппинга строковых значений к числовым.
+     *
+     * @return array<string, int>
+     */
+    private function getMapping(): array
+    {
+        return $this->enumClass::name();
     }
 }
